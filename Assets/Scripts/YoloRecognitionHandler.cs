@@ -16,7 +16,7 @@ namespace Assets.Scripts
         private GameObject labelObject;
 
         [SerializeField]
-        private ObjectClass triggerClass = ObjectClass.Tv;
+        private ObjectClass triggerClass = ObjectClass.Cup;
 
         [SerializeField]
         [Range(0f, 1f)]

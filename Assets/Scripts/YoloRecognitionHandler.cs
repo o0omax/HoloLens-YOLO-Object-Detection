@@ -15,6 +15,13 @@ namespace Assets.Scripts
         [SerializeField]
         private GameObject labelObject;
 
+        [SerializeField]
+        private ObjectClass triggerClass = ObjectClass.Cup;
+
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float triggerConfidence = 0.8f;
+
         private YoloDebugOutput yoloDebugOutput;
 
         private void Start()
@@ -138,6 +145,17 @@ namespace Assets.Scripts
 
                 // Show debug information
                 yoloDebugOutput.ShowDebugInformationForItem(item);
+
+                // Always log recognition details
+                Debug.Log($"[YOLO] Found: {item.YoloItem.MostLikelyClass} ({item.YoloItem.Confidence:0.00}), " +
+                          $"TriggerClass={triggerClass}, TriggerConfidence={triggerConfidence:0.00}");
+
+                if (item.YoloItem.MostLikelyClass == triggerClass &&
+                    item.YoloItem.Confidence >= triggerConfidence)
+                {
+                    Debug.LogWarning($"=== TRIGGERED {triggerClass} ({item.YoloItem.Confidence:0.00}) ===");
+                    // TODO: Replace with API call or custom action
+                }
             }
         }
 

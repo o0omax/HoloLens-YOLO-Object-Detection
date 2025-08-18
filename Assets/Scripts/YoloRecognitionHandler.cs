@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 namespace Assets.Scripts
 {
@@ -21,6 +22,9 @@ namespace Assets.Scripts
         [SerializeField]
         [Range(0f, 1f)]
         private float triggerConfidence = 0.8f;
+
+        [SerializeField]
+        private TMP_Text statusText;
 
         private YoloDebugOutput yoloDebugOutput;
 
@@ -154,6 +158,13 @@ namespace Assets.Scripts
                     item.YoloItem.Confidence >= triggerConfidence)
                 {
                     Debug.LogWarning($"=== TRIGGERED {triggerClass} ({item.YoloItem.Confidence:0.00}) ===");
+
+                    if (this.statusText != null)
+                    {
+                        this.statusText.text =
+                            $"{item.YoloItem.MostLikelyClass} class found, sending image to the cloud...";
+                    }
+
                     // TODO: Replace with API call or custom action
                 }
             }

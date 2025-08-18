@@ -146,9 +146,14 @@ namespace Assets.Scripts
                 // Show debug information
                 yoloDebugOutput.ShowDebugInformationForItem(item);
 
-                if (item.YoloItem.MostLikelyClass == triggerClass && item.YoloItem.Confidence >= triggerConfidence)
+                // Always log recognition details
+                Debug.Log($"[YOLO] Found: {item.YoloItem.MostLikelyClass} ({item.YoloItem.Confidence:0.00}), " +
+                          $"TriggerClass={triggerClass}, TriggerConfidence={triggerConfidence:0.00}");
+
+                if (item.YoloItem.MostLikelyClass == triggerClass &&
+                    item.YoloItem.Confidence >= triggerConfidence)
                 {
-                    Debug.Log($"Triggering custom action for {triggerClass} with confidence {item.YoloItem.Confidence}");
+                    Debug.LogWarning($"=== TRIGGERED {triggerClass} ({item.YoloItem.Confidence:0.00}) ===");
                     // TODO: Replace with API call or custom action
                 }
             }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
+using UnityEngine.Networking;
 
 namespace Assets.Scripts
 {
@@ -14,6 +16,9 @@ namespace Assets.Scripts
 
         [SerializeField]
         private GameObject labelObject;
+
+        [SerializeField]
+        private TMP_Text statusText;
 
         private YoloDebugOutput yoloDebugOutput;
 
@@ -138,6 +143,16 @@ namespace Assets.Scripts
 
                 // Show debug information
                 yoloDebugOutput.ShowDebugInformationForItem(item);
+
+                if (item.YoloItem.MostLikelyClass == ObjectClass.Cup && item.YoloItem.Confidence >= 0.8f)
+                {
+                    if (this.statusText != null)
+                    {
+                        this.statusText.text = "Cup found – uploading…";
+                    }
+
+                    this.UploadTriggeredFrameAsync();
+                }
             }
         }
 
@@ -155,7 +170,51 @@ namespace Assets.Scripts
             ObjectLabelController labelController = item.TrackingMarker.GetComponent<ObjectLabelController>();
             labelController.Text = $"{item.YoloItem.MostLikelyClass} ({Math.Round(item.YoloItem.Confidence * 100, 3)}%)";
             labelController.UpdatePosition(item.PositionInSpace);
-   
+
+        }
+
+        private async void UploadTriggeredFrameAsync()
+        {
+            using UnityWebRequest request = UnityWebRequest.Get(string.Empty);
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                if (this.statusText != null)
+                {
+                    this.statusText.text = $"Error: {request.error}";
+                }
+
+                return;
+            }
+
+            SerialResponse response = null;
+            try
+            {
+                response = JsonUtility.FromJson<SerialResponse>(request.downloadHandler.text);
+            }
+            catch (Exception)
+            {
+                // Ignore parsing exception, will handle below
+            }
+
+            if (!string.IsNullOrEmpty(response?.serialNumber))
+            {
+                if (this.statusText != null)
+                {
+                    this.statusText.text = $"Serial: {response.serialNumber}";
+                }
+            }
+            else if (this.statusText != null)
+            {
+                this.statusText.text = "Error retrieving serial";
+            }
+        }
+
+        [Serializable]
+        private class SerialResponse
+        {
+            public string serialNumber;
         }
     }
 }

@@ -20,11 +20,17 @@ namespace Assets.Scripts
         [SerializeField]
         private TMP_Text statusText;
 
+        [SerializeField]
+        private float debugInterval = 3f;
+
+        private float nextDebugTime;
+
         private YoloDebugOutput yoloDebugOutput;
 
         private void Start()
         {
             this.yoloDebugOutput = gameObject.GetComponent<YoloDebugOutput>();
+            this.nextDebugTime = 0f;
         }
 
         /// <summary>
@@ -135,14 +141,23 @@ namespace Assets.Scripts
 
         private void TriggerDetectionActions()
         {
+            bool showDebug = false;
+            if (Time.time >= this.nextDebugTime)
+            {
+                showDebug = true;
+                this.nextDebugTime = Time.time + this.debugInterval;
+            }
+
             // Only apply actions if item have been seen multiple times.
             foreach (DisplayedItem item in this.yoloItems.Where(item => item.IsInCameraView && item.TimesSeen >= Parameters.MinTimesSeen))
             {
                 // Show marker
                 this.ManageTrackingMarker(item);
 
-                // Show debug information
-                yoloDebugOutput.ShowDebugInformationForItem(item);
+                if (showDebug)
+                {
+                    yoloDebugOutput.ShowDebugInformationForItem(item);
+                }
 
                 if (item.YoloItem.MostLikelyClass == ObjectClass.Cup && item.YoloItem.Confidence >= 0.8f)
                 {

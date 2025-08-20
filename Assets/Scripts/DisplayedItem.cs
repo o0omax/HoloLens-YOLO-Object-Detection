@@ -19,6 +19,7 @@ namespace Assets.Scripts
             this.TimesSeen = 1;
             this.PositionInSpace = positionInSpace;
             this.IsInCameraView = true;
+            this.ActionTriggered = false;
         }
 
         /// <summary>
@@ -50,6 +51,11 @@ namespace Assets.Scripts
         ///     Tracking marker for the recognized item.
         /// </summary>
         public GameObject TrackingMarker { get; set; }
+
+        /// <summary>
+        ///     Indicates if an action has already been triggered for this item.
+        /// </summary>
+        public bool ActionTriggered { get; set; }
 
         /// <summary>
         ///     Updates the item with new information from the current frame.

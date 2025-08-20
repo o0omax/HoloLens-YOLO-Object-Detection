@@ -138,6 +138,13 @@ namespace Assets.Scripts
 
                 // Show debug information
                 yoloDebugOutput.ShowDebugInformationForItem(item);
+
+                // Announce detection of a cup once to reduce overhead
+                if (!item.ActionTriggered && item.YoloItem.MostLikelyClass == ObjectClass.Cup && item.YoloItem.Confidence >= 0.8f)
+                {
+                    Debug.Log($"Cup detected ({Math.Round(item.YoloItem.Confidence * 100, 1)}%)");
+                    item.ActionTriggered = true;
+                }
             }
         }
 
